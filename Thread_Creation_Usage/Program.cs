@@ -2,6 +2,8 @@
 
 Console.WriteLine("1 for 1000 tasks");
 Console.WriteLine("2 for 1000 threads");
+Console.WriteLine("______________________________");
+Console.WriteLine("Enter your selection:");
 string selection = Console.ReadLine();
 
 switch (selection)
@@ -30,7 +32,7 @@ static void Start1000Threads()
         string pause = "";
         ProcessThread processThread = null;
 
-        for (int i = 0; i <= 1000; i++)
+        for (int i = 0; i <= 100000; i++)
         {
             Process.GetCurrentProcess().Threads.Add(processThread);
             if (pause != String.Empty)
@@ -61,7 +63,7 @@ static void Start1000Tasks()
         {
             Task.Factory.StartNew(() =>
             {
-                for (int i = 0; i <= 1000; i++)
+                for (int i = 0; i <= 100000; i++)
                 {
 
                     if (pause != String.Empty)
