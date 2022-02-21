@@ -6,81 +6,87 @@ Console.WriteLine("______________________________");
 Console.WriteLine("Enter your selection:");
 string selection = Console.ReadLine();
 
-switch (selection)
+ManualResetEvent resetEvent = new ManualResetEvent(false);
+
+try
 {
-    case "1":
-        {
-            Start1000Tasks();
+    switch (selection)
+    {
+        case "1":
+            {
+                Start1000Tasks();
+                
+                break;
+            }
+        case "2":
+            {
+                Start1000Threads();
+                resetEvent.Set();
+                break;
+            }
+        default:
+
+            resetEvent.Set();
             break;
-        }
-    case "2":
-        {
-            Start1000Threads();
-            break;
-        }
-    default:
-        ManualResetEvent resetEvent = new ManualResetEvent(false);
-        resetEvent.Set();
-        break;
+    }
 }
+catch (OutOfMemoryException)
+{
+    resetEvent.Set();
+    Environment.Exit(0);
+}
+finally
+{
+    resetEvent.Set();
+    Environment.Exit(0);
+}
+
+
 
 static void Start1000Threads()
 {
-    const Int32 OneMB = 1024 * 1024;
+    const int OneMB = 1024 * 1024;
     using (ManualResetEvent wakeThreads = new ManualResetEvent(false))
     {
         string pause = "";
-        ProcessThread processThread = null;
-
         for (int i = 0; i <= 100000; i++)
         {
-            Process.GetCurrentProcess().Threads.Add(processThread);
-            if (pause != String.Empty)
-            {
-                wakeThreads.Set();
-                Debugger.Break();
-            }
-            Console.WriteLine("current thread is thread number {0}", i);
+            Thread t = new Thread(Start);            
+            Console.WriteLine("current index is {0}", i);
 
-            Console.WriteLine("{0}: {1}MB Nonpaged", ++i, Process.GetCurrentProcess().NonpagedSystemMemorySize64 / OneMB);
-            Console.WriteLine("{0}: {1} Handles", ++i, Process.GetCurrentProcess().HandleCount);
-            Console.WriteLine("{0}: {1}MB Paged", ++i, Process.GetCurrentProcess().PagedMemorySize64 / OneMB);
+            Console.WriteLine("{0} Threads: {1}MB Nonpaged", Process.GetCurrentProcess().Threads.Count, Process.GetCurrentProcess().NonpagedSystemMemorySize64 / OneMB);
+            Console.WriteLine("{0} Threads: {1} Handles", Process.GetCurrentProcess().Threads.Count, Process.GetCurrentProcess().HandleCount);
+            Console.WriteLine("{0} Threads: {1}MB Paged", Process.GetCurrentProcess().Threads.Count, Process.GetCurrentProcess().PagedMemorySize64 / OneMB);
             Console.WriteLine("___________________________________");
-
-            pause = Console.ReadLine();
         }
     }
+}
+static void Start()
+{
 }
 
 static void Start1000Tasks()
 {
-    const Int32 OneMB = 1024 * 1024;
+    const int OneMB = 1024 * 1024;
     using (ManualResetEvent wakeThreads = new ManualResetEvent(false))
     {
-        string pause = "";
-
-        while (true)
+        while (Console.ReadLine != null)
         {
-            Task.Factory.StartNew(() =>
+
+            for (int i = 0; i <= 100000; i++)
             {
-                for (int i = 0; i <= 100000; i++)
+                Task.Factory.StartNew(() =>
                 {
-
-                    if (pause != String.Empty)
-                    {
-                        wakeThreads.Set();
-                        Debugger.Break();
-                    }
-                    Console.WriteLine("current thread is thread number {0}", i);
-
-                    Console.WriteLine("{0}: {1}MB Nonpaged", ++i, Process.GetCurrentProcess().NonpagedSystemMemorySize64 / OneMB);
-                    Console.WriteLine("{0}: {1} Handles", ++i, Process.GetCurrentProcess().HandleCount);
-                    Console.WriteLine("{0}: {1}MB Paged", ++i, Process.GetCurrentProcess().PagedMemorySize64 / OneMB);
+                    Console.WriteLine("current index is {0}", i);
+                    Console.WriteLine("Current Task ID is: {0}", Task.CurrentId);
+                    Console.WriteLine("{0}MB Nonpaged", Process.GetCurrentProcess().NonpagedSystemMemorySize64 / OneMB);
+                    Console.WriteLine("{0} Handles", Process.GetCurrentProcess().HandleCount);
+                    Console.WriteLine("{0}MB Paged", Process.GetCurrentProcess().PagedMemorySize64 / OneMB);
                     Console.WriteLine("___________________________________");
 
-                    pause = Console.ReadLine();
-                }
-            });
+                });
+            }
+            wakeThreads.Set();
         }
     };
 }
