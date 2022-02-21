@@ -1,10 +1,14 @@
 ﻿using System.Diagnostics;
-
-Console.WriteLine("1 for 1000 tasks");
-Console.WriteLine("2 for 1000 threads");
+Console.WriteLine("This utility will run either a bunch ");
+Console.WriteLine("of threads or a bunch of tasks");
+Console.WriteLine("to show how much overhead each has.");
+Console.WriteLine("");
+Console.WriteLine("1 for 1000000 tasks");
+Console.WriteLine("2 for 1000000 threads");
 Console.WriteLine("______________________________");
 Console.WriteLine("Enter your selection:");
 string selection = Console.ReadLine();
+Console.WriteLine(selection);
 
 
 ManualResetEvent resetEvent = new ManualResetEvent(false);
