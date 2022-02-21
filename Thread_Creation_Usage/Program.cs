@@ -10,7 +10,6 @@ Console.WriteLine("Enter your selection:");
 string selection = Console.ReadLine();
 Console.WriteLine(selection);
 
-
 ManualResetEvent resetEvent = new ManualResetEvent(false);
 
 try
