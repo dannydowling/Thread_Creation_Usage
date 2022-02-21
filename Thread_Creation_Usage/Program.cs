@@ -15,7 +15,7 @@ try
         case "1":
             {
                 Start1000Tasks();
-                
+                resetEvent.Set();
                 break;
             }
         case "2":
@@ -25,7 +25,6 @@ try
                 break;
             }
         default:
-
             resetEvent.Set();
             break;
     }
@@ -41,52 +40,50 @@ finally
     Environment.Exit(0);
 }
 
-
-
 static void Start1000Threads()
 {
     const int OneMB = 1024 * 1024;
-    using (ManualResetEvent wakeThreads = new ManualResetEvent(false))
-    {
-        string pause = "";
-        for (int i = 0; i <= 100000; i++)
-        {
-            Thread t = new Thread(Start);            
-            Console.WriteLine("current index is {0}", i);
 
-            Console.WriteLine("{0} Threads: {1}MB Nonpaged", Process.GetCurrentProcess().Threads.Count, Process.GetCurrentProcess().NonpagedSystemMemorySize64 / OneMB);
-            Console.WriteLine("{0} Threads: {1} Handles", Process.GetCurrentProcess().Threads.Count, Process.GetCurrentProcess().HandleCount);
-            Console.WriteLine("{0} Threads: {1}MB Paged", Process.GetCurrentProcess().Threads.Count, Process.GetCurrentProcess().PagedMemorySize64 / OneMB);
-            Console.WriteLine("___________________________________");
-        }
+    for (int i = 0; i <= 100000; i++)
+    {
+        Thread t = new Thread(Start);
+        Console.WriteLine("current index is {0}", i);
+
+        Console.WriteLine("{0} Threads: {1}MB Nonpaged",
+            Process.GetCurrentProcess().Threads.Count,
+            Process.GetCurrentProcess().NonpagedSystemMemorySize64 / OneMB);
+
+        Console.WriteLine("{0} Threads: {1} Handles",
+            Process.GetCurrentProcess().Threads.Count,
+            Process.GetCurrentProcess().HandleCount);
+
+        Console.WriteLine("{0} Threads: {1}MB Paged",
+            Process.GetCurrentProcess().Threads.Count,
+            Process.GetCurrentProcess().PagedMemorySize64 / OneMB);
+        Console.WriteLine("___________________________________");
     }
 }
-static void Start()
-{
-}
+static void Start() { Random random = new Random(); }
 
 static void Start1000Tasks()
 {
     const int OneMB = 1024 * 1024;
-    using (ManualResetEvent wakeThreads = new ManualResetEvent(false))
+
+    while (Console.ReadLine != null)
     {
-        while (Console.ReadLine != null)
+
+        for (int i = 0; i <= 100000; i++)
         {
-
-            for (int i = 0; i <= 100000; i++)
+            Task.Factory.StartNew(() =>
             {
-                Task.Factory.StartNew(() =>
-                {
-                    Console.WriteLine("current index is {0}", i);
-                    Console.WriteLine("Current Task ID is: {0}", Task.CurrentId);
-                    Console.WriteLine("{0}MB Nonpaged", Process.GetCurrentProcess().NonpagedSystemMemorySize64 / OneMB);
-                    Console.WriteLine("{0} Handles", Process.GetCurrentProcess().HandleCount);
-                    Console.WriteLine("{0}MB Paged", Process.GetCurrentProcess().PagedMemorySize64 / OneMB);
-                    Console.WriteLine("___________________________________");
+                Console.WriteLine("current index is {0}", i);
+                Console.WriteLine("Current Task ID is: {0}", Task.CurrentId);
+                Console.WriteLine("{0}MB Nonpaged", Process.GetCurrentProcess().NonpagedSystemMemorySize64 / OneMB);
+                Console.WriteLine("{0} Handles", Process.GetCurrentProcess().HandleCount);
+                Console.WriteLine("{0}MB Paged", Process.GetCurrentProcess().PagedMemorySize64 / OneMB);
+                Console.WriteLine("___________________________________");
 
-                });
-            }
-            wakeThreads.Set();
+            });
         }
     };
 }
